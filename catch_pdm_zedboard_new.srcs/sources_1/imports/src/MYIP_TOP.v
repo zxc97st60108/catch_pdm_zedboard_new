@@ -14,12 +14,9 @@ module  MYIP_TOP (
             hrdata_es1,
             hresp_es1,
             hreadyout_es1,
+            // pdm_config
             pdm_in,
-            pdm_signal,
-            pdm_array_in,
-            pdm_array_out,
-            wr_en,
-            rd_en
+            pdm_signal
 
         );
 
@@ -36,12 +33,9 @@ input        hready; 	       // Transfer ready
 // input [1:0] pdm_config;
 input pdm_signal;
 input pdm_in;
-input [31:0] pdm_array_in;
-output [31:0] pdm_array_out;
-output wr_en,rd_en;
 
 input			 hsel_es1;               // Chip select for External Slave
-output [31:0] hrdata_es1;     	    // AHB read data bus from External Slave
+output[31:0] hrdata_es1;     	    // AHB read data bus from External Slave
 output       hreadyout_es1;  	    // Transfer ready from External Slave
 output       hresp_es1;              // Transfer response from External Slave
 
@@ -50,16 +44,16 @@ output       hresp_es1;              // Transfer response from External Slave
 // Constant declarations
 // -----------------------------------------------------------------------------
 // HTRANS transfer type signal encoding
-parameter TRN_IDLE   = 2'b00;
-parameter TRN_BUSY   = 2'b01;
-parameter TRN_NONSEQ = 2'b10;
-parameter TRN_SEQ    = 2'b11;
+// parameter TRN_IDLE   = 2'b00;
+// parameter TRN_BUSY   = 2'b01;
+// parameter TRN_NONSEQ = 2'b10;
+// parameter TRN_SEQ    = 2'b11;
 
 // HRESP transfer response signal encoding
-parameter RSP_OKAY   = 2'b00;
-parameter RSP_ERROR  = 2'b01;
-parameter RSP_RETRY  = 2'b10;
-parameter RSP_SPLIT  = 2'b11;
+// parameter RSP_OKAY   = 2'b00;
+// parameter RSP_ERROR  = 2'b01;
+// parameter RSP_RETRY  = 2'b10;
+// parameter RSP_SPLIT  = 2'b11;
 
 //--------------------------------------------------------------------------
 // Behavior
@@ -71,9 +65,11 @@ reg [2:0] NextState;
 
 wire cen, bsy;
 wire [1:0]ctrl;
-// wire [31:0] dout;
+wire [31:0] dout;
 reg hwrite_reg;
 reg cen_wait;
+wire full_signal;
+wire empty_signal;
 
 assign ctrl = (hwrite_reg && (haddr_reg == 32'h40300000))? hwdata[1:0] : 2'b00;
 
@@ -92,7 +88,7 @@ always @(negedge hreset_n or posedge g_hclk_es1) begin
         hwrite_reg <= hwrite;
 end
 
-assign hrdata_es1 = (haddr_reg == 32'h40400000)? {31'h0000_0000, bsy} : pdm_array_in;   //給AHB bus
+assign hrdata_es1 = (haddr_reg == 32'h40400000 || empty_signal)? {31'h0000_0000, bsy} : dout;
 assign hreadyout_es1 = (cen_wait == 1'b0)? 1'b1:1'b0;
 assign hresp_es1     = 1'b0; //2'b00
 
@@ -105,19 +101,17 @@ always @(posedge g_hclk_es1 or negedge hreset_n) begin
         cen_wait <= 1'b0;
 end
 
-
-assign wr_en = bsy ? 1'b1 : 1'b0;
-assign rd_en = (~bsy && ctrl[0]) ? 1'b1 : 1'b0;     //bsy = 存完值  && 訊號線給1 啟動
-
 pdm_m pdm(
           .AHBclk(g_hclk_es1),
           .PDMclk(pdm_in),
           .rst(hreset_n),
           .ctrl(ctrl),
-          //   .addr(haddr_reg),
+          .addr(haddr_reg),
           .pdm_signal(pdm_signal),
-          .dout(pdm_array_out),
-          .bsy(bsy)
+          .dout(dout),
+          .bsy(bsy),
+        //   .full_signal(full_signal),
+          .empty_signal(empty_signal)
       );
 
 endmodule

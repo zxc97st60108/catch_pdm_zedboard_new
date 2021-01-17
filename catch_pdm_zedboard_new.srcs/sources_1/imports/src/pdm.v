@@ -6,26 +6,35 @@ module pdm_m(
            input wire [1:0] ctrl,
            input wire [31:0] addr,      //outside memory addr;
            input wire pdm_signal,
-           output wire [31:0] pdm_array,
-           output wire bsy
+           output wire [31:0] dout,
+           output wire bsy,
+           //    output wire full_signal,
+           output wire empty_signal
        );
 
-// wire RW;
+wire RW;
 wire [15:0]  memory_idx;		//memory addr
 // wire [15:0]  memory_idx2;		//memory addr
-// wire [31:0] pdm_array;
+wire [31:0] pdm_array;
 wire cnt_en;
-// wire sel_clk;
+wire sel_clk;
 wire w_i;
+wire full_signal;
+// wire empty_signal;
+wire wr_rst_busy;
+wire rd_rst_busy;
+
 //TODO: control module
 read_ctrl ctrl_r(
               .ahb_clk(AHBclk),
               .rst(rst),
+              .ctrl(ctrl),
               //   .didx(memory_idx),
               .w_i(w_i),
               .cnt_en(cnt_en),
-              //   .RW(RW),
+                .RW(RW),
               .bsy(bsy)
+              //   .fifo_empty(empty_signal)
           );
 
 write_ctrl ctrl_w(
@@ -37,6 +46,7 @@ write_ctrl ctrl_w(
                .cnt_en(cnt_en),
                .pdm(pdm_array),
                .didx(memory_idx)	//memory_idx
+               //    .fifo_full(full_signal)
            );
 
 // glitch_free gf_m(
@@ -62,5 +72,18 @@ write_ctrl ctrl_w(
 //          .di(dout)
 //      );
 
+fifo_generator_0 async_fifo (
+                     .rst(rst),                  // input wire rst
+                     .wr_clk(PDMclk),            // input wire wr_clk
+                     .rd_clk(AHBclk),            // input wire rd_clk
+                     .din(pdm_array),                  // input wire [31 : 0] din
+                     .wr_en(bsy),              // input wire wr_en
+                     .rd_en(~bsy),              // input wire rd_en
+                     .dout(dout),                // output wire [31 : 0] dout
+                     .full(full_signal),                // output wire full
+                     .empty(empty_signal),              // output wire empty
+                     .wr_rst_busy(wr_rst_busy),  // output wire wr_rst_busy
+                     .rd_rst_busy(rd_rst_busy)  // output wire rd_rst_busy
+                 );
 
 endmodule
