@@ -14,9 +14,12 @@ module  MYIP_TOP (
             hrdata_es1,
             hresp_es1,
             hreadyout_es1,
-            // pdm_config
             pdm_in,
-            pdm_signal
+            pdm_signal,
+            pdm_array_in,
+            pdm_array_out,
+            wr_en,
+            rd_en
 
         );
 
@@ -33,9 +36,12 @@ input        hready; 	       // Transfer ready
 // input [1:0] pdm_config;
 input pdm_signal;
 input pdm_in;
+input [31:0] pdm_array_in;
+output [31:0] pdm_array_out;
+output wr_en,rd_en;
 
 input			 hsel_es1;               // Chip select for External Slave
-output[31:0] hrdata_es1;     	    // AHB read data bus from External Slave
+output [31:0] hrdata_es1;     	    // AHB read data bus from External Slave
 output       hreadyout_es1;  	    // Transfer ready from External Slave
 output       hresp_es1;              // Transfer response from External Slave
 
@@ -65,7 +71,7 @@ reg [2:0] NextState;
 
 wire cen, bsy;
 wire [1:0]ctrl;
-wire [31:0] dout;
+// wire [31:0] dout;
 reg hwrite_reg;
 reg cen_wait;
 
@@ -86,7 +92,7 @@ always @(negedge hreset_n or posedge g_hclk_es1) begin
         hwrite_reg <= hwrite;
 end
 
-assign hrdata_es1 = (haddr_reg == 32'h40400000)? {31'h0000_0000, bsy} : dout;
+assign hrdata_es1 = (haddr_reg == 32'h40400000)? {31'h0000_0000, bsy} : pdm_array_in;   //給AHB bus
 assign hreadyout_es1 = (cen_wait == 1'b0)? 1'b1:1'b0;
 assign hresp_es1     = 1'b0; //2'b00
 
@@ -99,14 +105,18 @@ always @(posedge g_hclk_es1 or negedge hreset_n) begin
         cen_wait <= 1'b0;
 end
 
+
+assign wr_en = bsy ? 1'b1 : 1'b0;
+assign rd_en = (~bsy && ctrl[0]) ? 1'b1 : 1'b0;     //bsy = 存完值  && 訊號線給1 啟動
+
 pdm_m pdm(
           .AHBclk(g_hclk_es1),
           .PDMclk(pdm_in),
           .rst(hreset_n),
           .ctrl(ctrl),
-          .addr(haddr_reg),
+          //   .addr(haddr_reg),
           .pdm_signal(pdm_signal),
-          .dout(dout),
+          .dout(pdm_array_out),
           .bsy(bsy)
       );
 
