@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2018.3.1 (64-bit)
+# SW Build 2489853 on Tue Mar 26 04:20:25 MDT 2019
+# IP Build 2486929 on Tue Mar 26 06:44:21 MDT 2019
+# Start of session at: Sun Dec 13 23:42:59 2020
+# Process ID: 20732
+# Current directory: D:/Vivado/catch_pdm_zedboard_new/catch_pdm_zedboard_new.runs/synth_1
+# Command line: vivado.exe -log MYIP_TOP.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source MYIP_TOP.tcl
+# Log file: D:/Vivado/catch_pdm_zedboard_new/catch_pdm_zedboard_new.runs/synth_1/MYIP_TOP.vds
+# Journal file: D:/Vivado/catch_pdm_zedboard_new/catch_pdm_zedboard_new.runs/synth_1\vivado.jou
+#-----------------------------------------------------------
+source MYIP_TOP.tcl -notrace
