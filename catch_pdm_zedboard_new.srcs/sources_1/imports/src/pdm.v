@@ -12,7 +12,8 @@ module pdm_m(
            output wire empty_signal
        );
 
-wire RW;
+// wire RW;
+wire wr_en,rd_en;
 wire [15:0]  memory_idx;		//memory addr
 // wire [15:0]  memory_idx2;		//memory addr
 wire [31:0] pdm_array;
@@ -32,7 +33,11 @@ read_ctrl ctrl_r(
               //   .didx(memory_idx),
               .w_i(w_i),
               .cnt_en(cnt_en),
-                .RW(RW),
+              // .RW(RW),
+              .wr_en(wr_en),
+              .rd_en(rd_en),
+              .wr_rst_busy(wr_rst_busy),
+              .rd_rst_busy(rd_rst_busy),
               .bsy(bsy)
               //   .fifo_empty(empty_signal)
           );
@@ -77,8 +82,8 @@ fifo_generator_0 async_fifo (
                      .wr_clk(PDMclk),            // input wire wr_clk
                      .rd_clk(AHBclk),            // input wire rd_clk
                      .din(pdm_array),                  // input wire [31 : 0] din
-                     .wr_en(bsy),              // input wire wr_en
-                     .rd_en(~bsy),              // input wire rd_en
+                     .wr_en(wr_en),              // input wire wr_en
+                     .rd_en(rd_en),              // input wire rd_en
                      .dout(dout),                // output wire [31 : 0] dout
                      .full(full_signal),                // output wire full
                      .empty(empty_signal),              // output wire empty
