@@ -5,7 +5,8 @@ module write_ctrl(
            input wire [1:0]ctrl,
            input wire pdm_signal,         //輸入pdm資料
            input wire cnt_en,
-           output reg w_i,
+        //    output wire RW,
+           output wire w_i,
            output reg [31:0] pdm,
            output reg [15:0] didx	//memory_idx
        );
@@ -56,11 +57,25 @@ always @(posedge pdm_clk or negedge rst) begin
     end
     else if(~|counter) //if didx<32 then didx++        counter[4]&counter[3]&counter[2]&counter[1]&counter[0]
     begin
-        didx <= didx+1'b1;
+        didx <= didx + 1'b1;
     end
     // if (counter == 31)
 end
 
+// assign RW = (~|counter) ? 1'b1 : 1'b0;
+// always @(posedge pdm_clk or negedge rst) begin
+//     if(~rst ) begin
+//         RW <= 1'b0;
+//     end
+//     else if(ctrl[1]) begin
+//         RW <= 1'b0;
+//     end
+//     else if(~|counter) //if didx<32 then didx++        counter[4]&counter[3]&counter[2]&counter[1]&counter[0]
+//     begin
+//         RW <= 1'b1;
+//     end
+//     // if (counter == 31)
+// end
 //didx寫入控制
 // always @(posedge pdm_clk or negedge rst) begin
 //     if(~rst) begin
@@ -73,10 +88,10 @@ end
 //         w_i <= 1'b1;
 //     end
 // end
-always @(*) begin
-    w_i = didx > 16'd47999 ? 1'b1 : 1'b0;
-    // if (counter == 31)
-end
-// assign w_i = didx > 16'd47999 ? 1'b1 : 1'b0;
+// always @(*) begin
+//     w_i = didx > 16'd47999 ? 1'b1 : 1'b0;
+//     // if (counter == 31)
+// end
+assign w_i = didx > 16'd47999 ? 1'b1 : 1'b0;
 
 endmodule

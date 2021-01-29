@@ -68,7 +68,7 @@ int main()
 
 	printf("polling busy\n");
 
-	while (*(io + (STATUS_OFFSET >> 2)) != (volatile unsigned int)0)
+	while (*(io + (STATUS_OFFSET >> 2)) != 0)
 	{
 		printf("0x%x_ ", *(io + (STATUS_OFFSET >> 2)));
 	}

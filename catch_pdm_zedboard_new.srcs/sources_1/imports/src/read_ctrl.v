@@ -12,7 +12,7 @@ module read_ctrl(
            output wire wr_rst_busy,
            output wire rd_rst_busy,
            output reg cnt_en,
-        //    output reg RW,				//if RW = 1 then 寫入 else
+           output reg RW,				//if RW = 1 then 寫入 else
            output reg bsy
        );
 
@@ -23,7 +23,7 @@ reg CS, NS;
 // localparam bound = 47999;
 
 //current state register
-always@(posedge ahb_clk) begin
+always@(posedge ahb_clk or negedge rst) begin
     if(~rst)
         CS<=Idle;
     else
@@ -56,7 +56,7 @@ end
 always@(*) begin
     case(CS)
         Idle: begin
-            // RW = 1'b0;
+            RW = 1'b0;
             rd_en = 1'b1;
             wr_en = 1'b0;
             cnt_en = 1'b0;
@@ -64,7 +64,7 @@ always@(*) begin
         end
         Shift://enable counter
         begin
-            // RW =  1'b1 ;  //小於46875
+            RW =  1'b1 ;  //小於46875
             rd_en = 1'b0;
             wr_en = 1'b1;
             cnt_en = 1'b1;
@@ -72,7 +72,7 @@ always@(*) begin
             // counter = 6'd0;
         end
         default: begin
-            // RW = 1'b0;
+            RW = 1'b0;
             rd_en = 1'b1;
             wr_en = 1'b0;
             // cnt_en = 1'b0;

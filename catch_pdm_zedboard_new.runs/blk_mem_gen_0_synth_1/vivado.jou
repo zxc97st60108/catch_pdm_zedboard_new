@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2018.3.1 (64-bit)
+# SW Build 2489853 on Tue Mar 26 04:20:25 MDT 2019
+# IP Build 2486929 on Tue Mar 26 06:44:21 MDT 2019
+# Start of session at: Fri Jan 29 00:53:31 2021
+# Process ID: 22796
+# Current directory: D:/Vivado/catch_pdm_zedboard_new/catch_pdm_zedboard_new.runs/blk_mem_gen_0_synth_1
+# Command line: vivado.exe -log blk_mem_gen_0.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source blk_mem_gen_0.tcl
+# Log file: D:/Vivado/catch_pdm_zedboard_new/catch_pdm_zedboard_new.runs/blk_mem_gen_0_synth_1/blk_mem_gen_0.vds
+# Journal file: D:/Vivado/catch_pdm_zedboard_new/catch_pdm_zedboard_new.runs/blk_mem_gen_0_synth_1\vivado.jou
+#-----------------------------------------------------------
+source blk_mem_gen_0.tcl -notrace
